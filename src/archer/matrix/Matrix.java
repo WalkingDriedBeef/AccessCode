@@ -1528,6 +1528,15 @@ public class Matrix implements Cloneable, java.io.Serializable {
 		}
 		System.out.println();
 	}
+	public void show(int dt){
+		for(int i=0; i<A.length; i++){
+			for(int j=0; j<A[i].length; j++){
+				System.out.printf("%"+dt+".0f ", A[i][j]);
+			}
+			System.out.println();
+		}
+		System.out.println();
+	}
 
 	/**
 	 * Sum the elements as the specified dimension.
