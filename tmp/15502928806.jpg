@@ -1,0 +1,50 @@
+package archer.classifier;
+
+import archer.matrix.Matrix;
+
+public class Threshold {
+
+	final static public int TH_MIN_ERROR = 1;
+	final static public int TH_OTSU = 2;
+
+	/**
+	 * 
+	 * @param M
+	 * @param H
+	 *            The histogram matrix of the data. the first column is the bin
+	 *            value, the second one is the counted number of bin.
+	 * @param method
+	 *            The name of the thresholding method.
+	 * @return
+	 */
+	static public double getThreshold(Matrix M, Matrix H, int method) {
+		double th = -1;
+		switch (method) {
+		case TH_MIN_ERROR:
+			th = th_min_error(H);
+			break;
+		case TH_OTSU:
+			th = th_otsu(H);
+		default:
+			// throw out expection
+		}
+
+		return th;
+	}
+
+	/**
+	 * Minimum error thresholding method, developed based on
+	 * 
+	 * @param H
+	 * @return
+	 * 
+	 * @reference J. Kittler, J. Illingworth, Minimum error thresholding,
+	 *            Pattern Recognition Volume 19, Issue 1, 1986, Pages 41�C47.
+	 */
+	static private double th_min_error(Matrix H) {
+		double th = -1;
+		int h = H.getRowDimension();
+		double[][] A = new double[h][3];
+		double a = 0;
+		double b = 0;
+		double c = 0;
