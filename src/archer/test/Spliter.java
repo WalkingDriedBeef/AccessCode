@@ -47,24 +47,18 @@ public class Spliter {
 		return tmp;
 	}
 	//找到某列上的的像素点数小于N时，这说明该地方很可能就是分割点（N = 2）
-	static int PIXEL_N_COUNT = 4;
-	static int PIXEL_THE_COUNT = 10;
-	public static List<Matrix> step2_split_by_pixel_n_col(Matrix mat){
-		LinkedHashMap<Integer, Double> indexs = new LinkedHashMap<Integer, Double>();
-		for(int i = 0; i < mat.getColumnDimension(); i++){
-			if(pixel_col_count(mat.getColumnArray(i)) <= PIXEL_N_COUNT)
-				indexs.put(i, 1.0 / (pixel_col_count(mat.getColumnArray(i)) + 1));
+	public static List<Matrix> step2_split_part(Matrix child, List<Matrix> spts){
+		int threshold_max = 13;
+		int threshold_min = 11;
+		int part = threshold_min + 1;
+		int left = child.getColumnDimension() - threshold_min - 1;
+		if(child.getColumnDimension() >= threshold_max){
+			spts.add(child.getMatrix(0, part));
+			return step2_split_part(child.getMatrix(left, child.getColumnDimension() - 1), spts);
+		}else{
+			spts.add(child);
 		}
-//		System.out.println(mat.getColumnDimension()/13);
-		for(Integer i: indexs.keySet()){
-			System.out.print(i + "\t");
-		}
-		System.out.println();
-		for(Integer i: indexs.keySet()){
-			System.out.printf("%1.1f\t",indexs.get(i));
-		}
-		System.out.println();
-		return null;
+		return spts;
 	}
 	
 	/*

@@ -1531,7 +1531,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
 	public void show(int dt){
 		for(int i=0; i<A.length; i++){
 			for(int j=0; j<A[i].length; j++){
-				System.out.printf("%"+dt+".0f ", A[i][j]);
+				System.out.print(A[i][j] == 0? "  " : "1 ");
 			}
 			System.out.println();
 		}
