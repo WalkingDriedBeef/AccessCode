@@ -10,8 +10,6 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-import com.jhlabs.image.ScaleFilter;
-
 import archer.image.accesscode.CharSpliter;
 import archer.matrix.Matrix;
 
@@ -60,8 +58,8 @@ public class Sample {
 				gray.set(i, j, gray.get(i, j) >= BinaryzationThreshold.otsu(gray) ? 0 : 1);
 			}
 		}
-		System.out.println("============二值化=========================================================================");
-		gray.show(1);
+//		System.out.println("============二值化=========================================================================");
+//		gray.show(1);
 		return gray;
 	}
 	
@@ -69,8 +67,8 @@ public class Sample {
 	//第三步，删除上下左右的全零行，亦或去噪
 	public static Matrix step3_remove_zero_line(Matrix bina){
 		Matrix rzl = Spliter.step1_remove_zero(bina);
-		System.out.println("============去0行=========================================================================");
-		rzl.show(1);
+//		System.out.println("============去0行=========================================================================");
+//		rzl.show(1);
 //		Spliter.step2_split_by_pixel_n_col(rzl);
 		return rzl;
 	}
@@ -112,11 +110,6 @@ public class Sample {
 			}
 		}
 	}
-	public static BufferedImage scaleImage(BufferedImage img){
-		ScaleFilter sf = new ScaleFilter(16,16);
-		BufferedImage imgdest = new BufferedImage(16,16, img.getType());
-		return sf.filter(img, imgdest);
-	}
 	public static HashMap<int[], String> loadTrainData(String train){
 		HashMap<int[], String> traindata = new HashMap<int[], String>();
 		for(File child: new File(train).listFiles()){
@@ -150,9 +143,9 @@ public class Sample {
 			st5s.addAll(step5_rev_merprol(tmp));
 		}
 		HashMap<int[], String> traindata = loadTrainData("dat");
-		System.out.println(traindata.size());
+//		System.out.println(traindata.size());
 		String result = "";
-		ToolShowImg.showimg(st5s);
+//		ToolShowImg.showimg(st5s);
 		for (Matrix mat : st5s) {
 			double min = Double.MAX_VALUE;
 			int[] tmp = null;
@@ -173,6 +166,8 @@ public class Sample {
 	
 	public static void main(String[] args) {
 //		getAllOcr("test/18601318772.gif");
-		getAllOcr("tmp/010-59549071.gif");
+		for(File child: new File("test").listFiles()){
+			getAllOcr(child.getAbsolutePath());
+		}
 	}
 }
