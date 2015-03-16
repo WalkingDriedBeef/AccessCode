@@ -227,23 +227,6 @@ public class CharSpliter {
 		return points;
 	}
 	
-	private boolean isSplitPoint2(List<Double> valueList, int position)
-	{
-		boolean isSplitPoint=false;
-		boolean judgeCondition1=false, judgeCondition2=false;
-		double difference1;
-		double thisV = valueList.get(position);
-		double beforeV = valueList.get(position-1);
-		difference1 = thisV - beforeV;
-		judgeCondition1 = thisV==0 || beforeV==0;
-		judgeCondition2 = difference1 != 0;
-		if(judgeCondition1 && judgeCondition2)
-		{
-			isSplitPoint = true;
-		}
-		return isSplitPoint;
-	}
-	
 	
 	/*验证该点是否是分割点
 	 * d(y)是y点的竖直投影值

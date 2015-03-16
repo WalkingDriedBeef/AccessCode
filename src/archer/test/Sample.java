@@ -14,10 +14,9 @@ import archer.matrix.Matrix;
 public class Sample {
 	
 	//第一步：获取图片的RGB信息，然后做转灰色处理
-	public static Matrix step1_RGB_Gray(){
+	public static Matrix step1_RGB_Gray(String imgpath){
 		try {
-//			File file = new File("tmp/13601306622.gif");
-			File file = new File("tmp/13601306622.gif");
+			File file = new File(imgpath);
 			Image img = ImageIO.read(file);
 			
 			BufferedImageBuilder bib = new BufferedImageBuilder();
@@ -85,15 +84,25 @@ public class Sample {
 	}
 	
 	public static void main(String[] args) {
-		Matrix gray = step1_RGB_Gray();
-		Matrix bina = step2_binaryzation(gray);
-		Matrix spt = step3_remove_zero_line(bina);
-		ToolShowImg.showimg(spt, "spt");
-		List<Matrix> mats = step4_split_img(spt);
-		int index = 0;
-		for(Matrix mat: mats){
-			for (Matrix tmat : step5_rev_merprol(mat)) {
-				ToolShowImg.showimg(tmat, "child - " + index++);
+		File dir = new File("tmp/");
+		for(File imgpath: dir.listFiles()){
+//			File imgpath = new File("tmp/64436871.gif");
+//			File imgpath = new File("tmp/13521671514.gif");
+			System.out.println(imgpath.getName());
+			Matrix gray = step1_RGB_Gray(imgpath.getAbsolutePath());
+			Matrix bina = step2_binaryzation(gray);
+			Matrix spt = step3_remove_zero_line(bina);
+			ToolShowImg.showimg(spt, "spt");
+			List<Matrix> mats = step4_split_img(spt);
+//			ToolShowImg.showimg(mats);
+			List<Matrix> st5s = new ArrayList<Matrix>();
+			for(Matrix tmp: mats){
+				st5s.addAll(step5_rev_merprol(tmp));
+			}
+//			ToolShowImg.showimg(st5s);
+			int index = 0;
+			for(Matrix mat: st5s){
+				ToolShowImg.buildImg(mat, "dat/" + imgpath.getName() + "-" + ++index + ".jpg");
 			}
 		}
 	}

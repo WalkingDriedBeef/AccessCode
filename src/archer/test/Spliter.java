@@ -1,7 +1,6 @@
 package archer.test;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import archer.matrix.Matrix;
@@ -46,15 +45,30 @@ public class Spliter {
 		Matrix tmp = mat.getMatrix(row_start, row_len - 1, start, len - 1);
 		return tmp;
 	}
-	//找到某列上的的像素点数小于N时，这说明该地方很可能就是分割点（N = 2）
+//	//找到某列上的的像素点数小于N时，这说明该地方很可能就是分割点（N = 2）
+//	public static List<Matrix> step1_split_part(Matrix mat){
+//		List<Matrix> spts = new ArrayList<Matrix>();
+//		int len = mat.getColumnDimension();
+//		int start = 0;
+//		int offset = 0;
+//		while((start < len) && (isZeroArray(mat.getColumnArray(start + offset)))){
+//			start ++;
+//		}
+//		while ((start < len) && (isZeroArray(mat.getColumnArray(len + offset - 1)))) {
+//		    len --;
+//		}
+//		return null;
+//	}
 	public static List<Matrix> step2_split_part(Matrix child, List<Matrix> spts){
-		int threshold_max = 13;
-		int threshold_min = 11;
-		int part = threshold_min + 1;
-		int left = child.getColumnDimension() - threshold_min - 1;
+		if(spts == null){
+			spts = new ArrayList<Matrix>();
+		}
+		int threshold_max = 17;
+		int threshold_min = 9;
+		int part = threshold_min;
 		if(child.getColumnDimension() >= threshold_max){
 			spts.add(child.getMatrix(0, part));
-			return step2_split_part(child.getMatrix(left, child.getColumnDimension() - 1), spts);
+			return step2_split_part(child.getMatrix(part - 2, child.getColumnDimension() - 1), spts);
 		}else{
 			spts.add(child);
 		}
