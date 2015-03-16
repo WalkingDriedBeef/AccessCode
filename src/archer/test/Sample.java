@@ -4,15 +4,18 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
+
+import com.jhlabs.image.ScaleFilter;
 
 import archer.image.accesscode.CharSpliter;
 import archer.matrix.Matrix;
 
 public class Sample {
-	
 	//第一步：获取图片的RGB信息，然后做转灰色处理
 	public static Matrix step1_RGB_Gray(String imgpath){
 		try {
@@ -83,16 +86,16 @@ public class Sample {
 		return Spliter.step2_split_part(child, new ArrayList<Matrix>());
 	}
 	
-	public static void main(String[] args) {
+	public static void train(){
 		File dir = new File("tmp/");
+		int index_l2 = 0;
 		for(File imgpath: dir.listFiles()){
-//			File imgpath = new File("tmp/64436871.gif");
 //			File imgpath = new File("tmp/13521671514.gif");
 			System.out.println(imgpath.getName());
 			Matrix gray = step1_RGB_Gray(imgpath.getAbsolutePath());
 			Matrix bina = step2_binaryzation(gray);
 			Matrix spt = step3_remove_zero_line(bina);
-			ToolShowImg.showimg(spt, "spt");
+//			ToolShowImg.showimg(spt, "spt");
 			List<Matrix> mats = step4_split_img(spt);
 //			ToolShowImg.showimg(mats);
 			List<Matrix> st5s = new ArrayList<Matrix>();
@@ -100,10 +103,76 @@ public class Sample {
 				st5s.addAll(step5_rev_merprol(tmp));
 			}
 //			ToolShowImg.showimg(st5s);
-			int index = 0;
-			for(Matrix mat: st5s){
-				ToolShowImg.buildImg(mat, "dat/" + imgpath.getName() + "-" + ++index + ".jpg");
+			String name = imgpath.getName().replace(".gif", "");
+			if(name.length() == st5s.size()){
+				for(int index = 0; index < name.length(); index++){
+					Matrix mat = st5s.get(index);
+					ToolShowImg.buildImg(mat, "dat/" + name.charAt(index) + "_" + ++index_l2 + ".jpg");
+				}
 			}
 		}
+	}
+	public static BufferedImage scaleImage(BufferedImage img){
+		ScaleFilter sf = new ScaleFilter(16,16);
+		BufferedImage imgdest = new BufferedImage(16,16, img.getType());
+		return sf.filter(img, imgdest);
+	}
+	public static HashMap<int[], String> loadTrainData(String train){
+		HashMap<int[], String> traindata = new HashMap<int[], String>();
+		for(File child: new File(train).listFiles()){
+			Matrix mat = step1_RGB_Gray(child.getAbsolutePath());
+			traindata.put(getFeature(mat, 256), String.valueOf(child.getName().charAt(0)));
+		}
+		return traindata;
+	}
+	public static int[] getFeature(Matrix mat, int feature){
+		if(feature <= 0) feature = 256;
+		int[] feats = new int[feature];
+		int flag = -1;
+		for(int i = 0; i < mat.getRowDimension(); i++){
+			for(int j = 0; j < mat.getColumnDimension(); j++){
+				if(++flag < feats.length){
+					feats[flag] = (int)mat.get(i, j);
+				}
+			}
+		}
+		return feats;
+	}
+	
+	
+	public static String getAllOcr(String file) {
+		Matrix gray = step1_RGB_Gray(file);
+		Matrix bina = step2_binaryzation(gray);
+		Matrix spt = step3_remove_zero_line(bina);
+		List<Matrix> mats = step4_split_img(spt);
+		List<Matrix> st5s = new ArrayList<Matrix>();
+		for(Matrix tmp: mats){
+			st5s.addAll(step5_rev_merprol(tmp));
+		}
+		HashMap<int[], String> traindata = loadTrainData("dat");
+		System.out.println(traindata.size());
+		String result = "";
+		ToolShowImg.showimg(st5s);
+		for (Matrix mat : st5s) {
+			double min = Double.MAX_VALUE;
+			int[] tmp = null;
+			for(int[] fet: traindata.keySet()){
+				double dist = Distance.cosineDis(getFeature(mat, 256),fet);
+				if(dist < min){
+					min = dist;
+					tmp = fet;
+				}
+			}
+			result += traindata.get(tmp);
+		}
+		System.out.println("---------------------------------------------");
+		System.out.println(file + "\t" + result);
+		System.out.println("---------------------------------------------");
+		return null;
+	}
+	
+	public static void main(String[] args) {
+//		getAllOcr("test/18601318772.gif");
+		getAllOcr("tmp/010-59549071.gif");
 	}
 }

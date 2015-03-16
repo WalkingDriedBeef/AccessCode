@@ -99,9 +99,10 @@ public class ToolShowImg {
 		int m = mat.getRowDimension();
 		int n = mat.getColumnDimension();
 		BufferedImage bimg = new BufferedImage(n, m, BufferedImage.TYPE_BYTE_GRAY);
+		ColorMap cm = new ColorMap_Gray();;
 		for (int i=0; i<m; i++) {
 			for (int j=0; j<n; j++) {
-				int rgb = (int)mat.get(i,j);
+				int rgb = cm.getColor(mat.get(i, j)).getRGB();
 				bimg.setRGB(j, i, rgb);
 			}
 		}
