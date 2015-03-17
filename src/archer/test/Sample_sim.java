@@ -29,6 +29,7 @@ import javax.imageio.ImageIO;
 import archer.matrix.Matrix;
 
 public class Sample_sim {
+	private static final int FEATURE_SIZE = 100;
 	//第一步：获取图片的RGB信息，然后做转灰色处理
 	public static Matrix step1_RGB_Gray(String imgpath){
 		try {
@@ -74,7 +75,7 @@ public class Sample_sim {
 		}
 		return gray;
 	}
-	//
+	//第三步，分割图片，非粘连图片，按照像素的边界区域分割（）
 	public static List<Matrix> step3_split_img(Matrix img) {
 		ArrayList<Integer> points = new ArrayList<Integer>();
 		for(int i = 0; i < img.getColumnDimension(); i++){
@@ -112,11 +113,7 @@ public class Sample_sim {
 		}
 		return result;
 	}
-	
-	public static List<Matrix> step5_rev_merprol(Matrix child){
-		return Spliter.step2_split_part(child, new ArrayList<Matrix>());
-	}
-	
+	//第四步，将分割后的图片当做训练数据保存起来
 	public static void train(){
 		File dir = new File("sim/img/");
 		int index_l2 = 0;
@@ -142,16 +139,17 @@ public class Sample_sim {
 //			break;
 		}
 	}
+	
 	public static HashMap<int[], String> loadTrainData(String train){
 		HashMap<int[], String> traindata = new HashMap<int[], String>();
 		for(File child: new File(train).listFiles()){
 			Matrix mat = step1_RGB_Gray(child.getAbsolutePath());
-			traindata.put(getFeature(mat, 100), String.valueOf(child.getName().charAt(0)));
+			traindata.put(getFeature(mat, FEATURE_SIZE), String.valueOf(child.getName().charAt(0)));
 		}
 		return traindata;
 	}
 	public static int[] getFeature(Matrix mat, int feature){
-		if(feature <= 0) feature = 256;
+		if(feature <= 0) feature = FEATURE_SIZE;
 		int[] feats = new int[feature];
 		int flag = -1;
 		for(int i = 0; i < mat.getRowDimension(); i++){
@@ -163,20 +161,18 @@ public class Sample_sim {
 		}
 		return feats;
 	}
+	//测试
 	public static String getAllOcr(String file, HashMap<int[], String> traindata) {
-		Matrix gray = step1_RGB_Gray(file);
-		Matrix bina = step2_binaryzation(gray);
-		Matrix rmv = Spliter.step1_remove_zero(bina);
-		List<Matrix> mats = step3_split_img(rmv);
-		
-		
-//		System.out.println(traindata.size());
+		Matrix gray = step1_RGB_Gray(file);            //加载图片
+		Matrix bina = step2_binaryzation(gray);        //二值化
+		Matrix rmv = Spliter.step1_remove_zero(bina);  //去除边界的非像素行或列
+		List<Matrix> mats = step3_split_img(rmv);      //分割图片
 		String result = "";
 		for (Matrix mat : mats) {
 			double min = Double.MAX_VALUE;
 			int[] tmp = null;
 			for(int[] fet: traindata.keySet()){
-				double dist = Distance.cosineDis(getFeature(mat, 100),fet);
+				double dist = Distance.cosineDis(getFeature(mat, FEATURE_SIZE),fet);
 				if(dist < min){
 					min = dist;
 					tmp = fet;
@@ -184,7 +180,6 @@ public class Sample_sim {
 			}
 			result += traindata.get(tmp);
 		}
-		System.out.println("---------------------------------------------");
 		System.out.println(file + "\t" + result + "\t" + (file.indexOf(result) > -1 ? 0 : 1));
 		System.out.println("---------------------------------------------");
 		return null;
@@ -192,6 +187,7 @@ public class Sample_sim {
 	
 	public static void main(String[] args) {
 //		train();
+//		加载训练数据
 		HashMap<int[], String> traindata = loadTrainData("sim/dat/");
 		for(File child: new File("sim/test/").listFiles()){
 			getAllOcr(child.getAbsolutePath(), traindata);
