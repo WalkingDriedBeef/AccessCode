@@ -28,7 +28,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import archer.matrix.Matrix;
 
-public class Sample_sim {
+public class Sample_sim2 {
 	//第一步：获取图片的RGB信息，然后做转灰色处理
 	public static Matrix step1_RGB_Gray(String imgpath){
 		try {
@@ -69,7 +69,7 @@ public class Sample_sim {
 	public static Matrix step2_binaryzation(Matrix gray){
 		for(int i = 0; i < gray.getRowDimension(); i++){
 			for(int j = 0; j < gray.getColumnDimension(); j++){
-				gray.set(i, j, gray.get(i, j) < BinaryzationThreshold.basic(255) ? 1 : 0);
+				gray.set(i, j, gray.get(i, j) < BinaryzationThreshold.basic(255)  && gray.get(i, j) >= 131 ? 0 : 1);
 			}
 		}
 		return gray;
@@ -104,11 +104,35 @@ public class Sample_sim {
 //			System.out.print(i + "\t");
 //		}
 //		System.out.println();
+		////////////////////////////////
+		if(tmp.size() == 5){
+			ArrayList<Integer> tmp_x = new ArrayList<Integer>();
+			for(int i = 0; i < tmp.size(); i++){
+				if(i == tmp.size() - 1){
+					tmp_x.add(tmp.get(i));
+				}else{
+					if(tmp.get(i+1) - tmp.get(i) >= 20 ){
+						tmp_x.add(tmp.get(i));
+						tmp_x.add(tmp.get(i) + (tmp.get(i+1) - tmp.get(i)) / 2 );
+					}else{
+						tmp_x.add(tmp.get(i));
+					}
+				}
+			}
+			tmp = tmp_x;
+		}
+		////////////////////////////////
+//		for(int i: tmp){
+//			System.out.print(i + "\t");
+//		}
+//		System.out.println();
+		if(tmp.size() != 6){
+			return null;
+		}
 		List<Matrix> result = new ArrayList<Matrix>();
 		for(int i = 0; i < tmp.size() - 1; i++){
 			Matrix x = img.getMatrix(tmp.get(i), tmp.get(i+1));
 			result.add(Spliter.step1_remove_zero(x));
-//			Spliter.step1_remove_zero(x).show(1);
 		}
 		return result;
 	}
@@ -122,24 +146,23 @@ public class Sample_sim {
 		int index_l2 = 0;
 		int index_fg = 0;
 		for(File imgpath: dir.listFiles()){
+//			File imgpath = new File("tmp/13521671514.gif");
 			System.out.println(imgpath.getName());
 			Matrix gray = step1_RGB_Gray(imgpath.getAbsolutePath());
 			Matrix bina = step2_binaryzation(gray);
 			Matrix rmv = Spliter.step1_remove_zero(bina);
-//			rmv.show(1);
 			List<Matrix> mats = step3_split_img(rmv);
 			String name = imgpath.getName().replace(".jpg", "");
 			if(mats == null){
 				continue;
 			}
 			System.out.println(++index_fg + "\t" + mats.size());
-			if(name.length() == mats.size()){
+			if(name.length() <= mats.size()){
 				for(int index = 0; index < name.length(); index++){
 					Matrix mat = mats.get(index);
 					ToolShowImg.buildImg(mat, "sim/dat/" + name.charAt(index) + "_" + ++index_l2 + ".jpg");
 				}
 			}
-//			break;
 		}
 	}
 	public static HashMap<int[], String> loadTrainData(String train){
@@ -163,13 +186,13 @@ public class Sample_sim {
 		}
 		return feats;
 	}
-	public static String getAllOcr(String file, HashMap<int[], String> traindata) {
+	public static String getAllOcr(String file) {
 		Matrix gray = step1_RGB_Gray(file);
 		Matrix bina = step2_binaryzation(gray);
 		Matrix rmv = Spliter.step1_remove_zero(bina);
 		List<Matrix> mats = step3_split_img(rmv);
 		
-		
+		HashMap<int[], String> traindata = loadTrainData("sim/dat/");
 //		System.out.println(traindata.size());
 		String result = "";
 		for (Matrix mat : mats) {
@@ -191,10 +214,11 @@ public class Sample_sim {
 	}
 	
 	public static void main(String[] args) {
-//		train();
-		HashMap<int[], String> traindata = loadTrainData("sim/dat/");
+		train();
+//		getAllOcr("test/18601318772.gif");
 		for(File child: new File("sim/test/").listFiles()){
-			getAllOcr(child.getAbsolutePath(), traindata);
+			getAllOcr(child.getAbsolutePath());
 		}
+//		train();
 	}
 }
