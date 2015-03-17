@@ -24,25 +24,27 @@ public class Spliter {
 	
 	//去除全0行，全0列
 	public static Matrix step1_remove_zero(Matrix mat){
-		int len = mat.getColumnDimension();
 		int start = 0;
-		int offset = 0;
+		int len = mat.getColumnDimension();
+		
 		int row_start = 0;
-		int row_offset =  0;
 		int row_len = mat.getRowDimension();
-		while((start < len) && (isZeroArray(mat.getColumnArray(start + offset)))){
+		while((start < len) && (isZeroArray(mat.getColumnArray(start)))){
 			start ++;
 		}
-		while ((start < len) && (isZeroArray(mat.getColumnArray(len + offset - 1)))) {
+		while ((start < len) && (isZeroArray(mat.getColumnArray(len - 1)))) {
 		    len --;
 		}
-		while((row_start < row_len) && (isZeroArray(mat.getRowArray(row_start + row_offset)))){
+		while((row_start < row_len) && (isZeroArray(mat.getRowArray(row_start)))){
 			row_start ++;
 		}
-		while ((row_start < row_len) && (isZeroArray(mat.getRowArray(row_len + row_offset - 1)))) {
+		while ((row_start < row_len) && (isZeroArray(mat.getRowArray(row_len - 1)))) {
 			row_len --;
 		}
+//		mat.show();
 		Matrix tmp = mat.getMatrix(row_start, row_len - 1, start, len - 1);
+//		tmp.show();
+//		System.out.println(row_start + "\t" + row_len  + "\t" + start + "\t" + len);
 		return tmp;
 	}
 //	//找到某列上的的像素点数小于N时，这说明该地方很可能就是分割点（N = 2）

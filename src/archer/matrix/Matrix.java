@@ -1668,10 +1668,12 @@ public class Matrix implements Cloneable, java.io.Serializable {
 	public double[] getRowArray(int row){
 		double [] array = new double[n];
 		if(row < m && row >= 0){
-			for(int i = 0; i < m; i++){
+			for(int i = 0; i < n; i++){
 				array[i] = this.get(row, i);
+//				System.out.print(this.get(row, i)+ " ");
 			}
 		}
+//		System.out.println();
 		return array;
 	}
 
