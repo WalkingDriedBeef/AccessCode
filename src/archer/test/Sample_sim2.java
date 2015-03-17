@@ -77,6 +77,7 @@ public class Sample_sim2 {
 	}
 	//第三步，分割图片，非粘连图片，按照像素的边界区域分割（）
 	public static List<Matrix> step3_split_img(Matrix img) {
+//		img.show(1);
 		ArrayList<Integer> points = new ArrayList<Integer>();
 		for(int i = 0; i < img.getColumnDimension(); i++){
 			if(Spliter.isZeroArray(img.getColumnArray(i))){
